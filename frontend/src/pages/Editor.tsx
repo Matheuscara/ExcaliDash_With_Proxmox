@@ -56,6 +56,13 @@ export const Editor: React.FC = () => {
   const [newName, setNewName] = useState('');
   const [initialData, setInitialData] = useState<any>(null);
   const [isSceneLoading, setIsSceneLoading] = useState(true);
+
+  useEffect(() => {
+    document.title = `${drawingName} - ExcaliDash`;
+    return () => {
+      document.title = 'ExcaliDash';
+    };
+  }, [drawingName]);
   
   const [peers, setPeers] = useState<Peer[]>([]);
   const [me] = useState(getUserIdentity());
