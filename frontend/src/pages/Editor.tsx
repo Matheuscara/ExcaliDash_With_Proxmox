@@ -526,11 +526,34 @@ export const Editor: React.FC = () => {
   // Disable native Excalidraw save dialogs
   // UIOptions is now defined outside the component
 
+  const handleBackClick = async () => {
+    // Save drawing and generate preview before navigating
+    if (excalidrawAPI.current && saveDataRef.current && savePreviewRef.current) {
+      const elements = excalidrawAPI.current.getSceneElementsIncludingDeleted();
+      const appState = excalidrawAPI.current.getAppState();
+      const files = excalidrawAPI.current.getFiles() || {};
+      latestElementsRef.current = elements;
+      latestFilesRef.current = files;
+      
+      try {
+        // Save both drawing data and preview
+        await Promise.all([
+          saveDataRef.current(elements, appState),
+          savePreviewRef.current(elements, appState, files)
+        ]);
+        console.log("[Editor] Saved on back navigation", { drawingId: id });
+      } catch (err) {
+        console.error('Failed to save on back navigation', err);
+      }
+    }
+    navigate('/');
+  };
+
   return (
     <div className="h-screen flex flex-col bg-white dark:bg-neutral-950 overflow-hidden">
       <header className="h-14 bg-white dark:bg-neutral-900 border-b border-gray-200 dark:border-neutral-800 flex items-center px-4 justify-between z-10">
         <div className="flex items-center gap-4">
-          <button onClick={() => navigate('/')} className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300">
+          <button onClick={handleBackClick} className="p-2 hover:bg-gray-100 dark:hover:bg-neutral-800 rounded-full text-gray-600 dark:text-gray-300">
             <ArrowLeft size={20} />
           </button>
 
