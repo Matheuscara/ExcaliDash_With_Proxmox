@@ -99,8 +99,14 @@ export const Editor: React.FC = () => {
   useEffect(() => {
     if (!id || !isReady) return;
 
-    const socket = io(import.meta.env.VITE_API_URL || 'http://localhost:8000', {
-      transports: ['websocket'],
+    // For production/Docker, connect to same origin. For dev, use localhost:8000
+    const socketUrl = import.meta.env.VITE_API_URL === '/api' 
+      ? window.location.origin 
+      : (import.meta.env.VITE_API_URL || 'http://localhost:8000');
+    
+    const socket = io(socketUrl, {
+      path: '/socket.io',
+      transports: ['websocket', 'polling'],
     });
     socketRef.current = socket;
 

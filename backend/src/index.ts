@@ -104,6 +104,11 @@ io.on("connection", (socket) => {
   });
 });
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
+
 // --- Drawings ---
 
 // GET /drawings
