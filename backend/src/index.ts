@@ -99,9 +99,14 @@ const upload = multer({
     files: 1, // Only one file per upload
   },
   fileFilter: (req, file, cb) => {
-    // Only allow .db files for SQLite imports
-    if (file.fieldname === "db" && !file.originalname.endsWith(".db")) {
-      return cb(new Error("Only .db files are allowed"));
+    // Only allow SQLite database extensions for database imports
+    if (file.fieldname === "db") {
+      const isSqliteDb =
+        file.originalname.endsWith(".db") ||
+        file.originalname.endsWith(".sqlite");
+      if (!isSqliteDb) {
+        return cb(new Error("Only .db or .sqlite files are allowed"));
+      }
     }
     cb(null, true);
   },
@@ -775,9 +780,14 @@ app.delete("/collections/:id", async (req, res) => {
 
 // --- Export/Import Endpoints ---
 
-// GET /export - Export SQLite database
+// GET /export - Export SQLite database (supports .sqlite and .db extensions)
 app.get("/export", async (req, res) => {
   try {
+    const formatParam =
+      typeof req.query.format === "string"
+        ? req.query.format.toLowerCase()
+        : undefined;
+    const extension = formatParam === "db" ? "db" : "sqlite";
     const dbPath = path.resolve(__dirname, "../prisma/dev.db");
 
     try {
@@ -791,7 +801,7 @@ app.get("/export", async (req, res) => {
       "Content-Disposition",
       `attachment; filename="excalidash-db-${
         new Date().toISOString().split("T")[0]
-      }.sqlite"`
+      }.${extension}"`
     );
 
     const fileStream = fs.createReadStream(dbPath);
