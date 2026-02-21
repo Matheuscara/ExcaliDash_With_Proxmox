@@ -2,24 +2,33 @@ services:
   backend:
     image: zimengxiong/excalidash-backend:latest
     container_name: excalidash-backend
-    environment:
-      - DATABASE_URL=file:/app/prisma/dev.db
-      - PORT=8000
-      - NODE_ENV=production
-      - AUTH_MODE=${AUTH_MODE:-local}
+    #environment:
+      #- DATABASE_URL=file:/app/prisma/dev.db
+      #- PORT=8000
+      #- NODE_ENV=production
+      #- AUTH_MODE=${AUTH_MODE:-local}
       # Keep disabled by default; only enable when a trusted proxy sanitizes forwarded headers.
-      - TRUST_PROXY=false
+      #- TRUST_PROXY=false
       # Optional for single-instance deployments:
       # if unset, backend auto-generates and persists one in the volume.
       # Recommended to set explicitly for portability and multi-instance setups.
-      - JWT_SECRET=${JWT_SECRET}
-      - CSRF_SECRET=${CSRF_SECRET}
+      #- JWT_SECRET=${JWT_SECRET}
+      #- CSRF_SECRET=${CSRF_SECRET}
       # Optional OIDC settings (required for AUTH_MODE=hybrid or oidc_enforced)
       # - OIDC_PROVIDER_NAME=Authentik
       # - OIDC_ISSUER_URL=https://auth.example.com/application/o/excalidash/
       # - OIDC_CLIENT_ID=your-client-id
       # - OIDC_CLIENT_SECRET=your-client-secret
       # - OIDC_REDIRECT_URI=https://excalidash.example.com/api/auth/oidc/callback
+    environment:
+      - DATABASE_URL=file:/app/prisma/dev.db
+      - PORT=8000
+      - NODE_ENV=production
+      - AUTH_MODE=local
+      - TRUST_PROXY=true
+      - ALLOWED_ORIGIN=http://{{ip_server}}:6767
+      - JWT_SECRET=sua_chave_secreta_aqui
+      - CSRF_SECRET=outra_chave_secreta_aqui
     volumes:
       - backend-data:/app/prisma
     networks:
